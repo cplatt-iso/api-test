@@ -1,8 +1,28 @@
-version: '3'
-
+version: '3.8'
 services:
   web:
-    build: .
+    build: ./web
     ports:
-      - "5000:80"
+      - "5000:5000"
+    environment:
+      - REDIS_HOST=db
+    depends_on:
+      - db
+  scraper:
+    build: ./scraper
+    environment:
+      - REDIS_HOST=db
+      - WORLD_TIDES_API_KEY=${WORLD_TIDES_API_KEY}
+      - LATITUDE=41.276822
+      - LONGITUDE=-72.802901
+    depends_on:
+      - db
+  db:
+    image: "redis:alpine"
+    volumes:
+      - redis-data:/data
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+volumes:
+  redis-data:
 
