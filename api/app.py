@@ -3,10 +3,13 @@ import platform
 import socket
 import time
 import json
-from flask import Flask, jsonify, __version__ as flask_version
+from flask import Flask, jsonify, __version__ as flask_version, request
+from flask_cors import CORS
 import redis
 
 app = Flask(__name__)
+
+cors = CORS(app, resources={r"/*": {"origins": "http://192.168.88.145"}})
 
 redis_host = os.getenv("REDIS_HOST", "db")
 redis_port = os.getenv("REDIS_PORT", 6379)
@@ -33,6 +36,26 @@ def tides():
     tides = r.get("tides")
     if tides:
         return jsonify(json.loads(tides))
+    else:
+        return jsonify({"error": "Tide data not available"}), 500
+
+@app.route('/api')
+def api():
+    # Check for unit parameter in request URL
+    units = request.args.get('unit')
+    if units == "ft":
+        unit_factor = 3.28084
+    else:
+        unit_factor = 1
+
+    # Get tide data from Redis
+    tides = r.get("tides")
+    if tides:
+        tides = json.loads(tides)
+        # Convert tide height to desired units
+        for tide in tides:
+            tide["height"] = tide["height"] * unit_factor
+        return jsonify({"tides": tides})
     else:
         return jsonify({"error": "Tide data not available"}), 500
 

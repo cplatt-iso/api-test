@@ -1,7 +1,7 @@
 version: '3.8'
 services:
-  web:
-    build: ./web
+  api:
+    build: ./api
     ports:
       - "5000:5000"
     environment:
@@ -23,6 +23,12 @@ services:
       - redis-data:/data
       - ./redis.conf:/usr/local/etc/redis/redis.conf
     command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+  ui:
+    build: ./ui
+    ports:
+      - "80:80"
+    depends_on:
+      - api
 volumes:
   redis-data:
 
