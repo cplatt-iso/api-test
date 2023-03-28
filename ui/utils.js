@@ -1,5 +1,3 @@
-import SunCalc from 'suncalc';
-
 function formatDate(date) {
   const day = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][date.getDay()];
   const month = date.toLocaleDateString('en-US', { month: 'short' });

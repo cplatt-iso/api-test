@@ -1,5 +1,5 @@
 import createTideChart from './tideChart.js';
-import formatDate from './utils.js';
+import { formatDate } from './utils.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   const tideDataElement = document.getElementById('tideData');
