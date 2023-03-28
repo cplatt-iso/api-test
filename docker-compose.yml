@@ -13,8 +13,8 @@ services:
     environment:
       - REDIS_HOST=db
       - WORLD_TIDES_API_KEY=${WORLD_TIDES_API_KEY}
-      - LATITUDE=41.276822
-      - LONGITUDE=-72.802901
+      - LATITUDE=41.261700
+      - LONGITUDE=-72.818298
     depends_on:
       - db
   db:

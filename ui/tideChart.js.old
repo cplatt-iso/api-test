@@ -1,0 +1,71 @@
+const createTideChart = (data) => {
+  const chartData = {
+    labels: [],
+    datasets: [
+      {
+        label: 'Tide Height',
+        data: [],
+        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+        borderColor: 'rgba(54, 162, 235, 1)',
+        borderWidth: 1,
+        tension: 0.4 // set tension to 0.4 for a more smooth line
+      }
+    ]
+  };
+
+  const now = new Date();
+  const nowIndex = data.tides.findIndex(tide => new Date(tide.date) > now) - 1;
+
+  data.tides.forEach((tide, index) => {
+    const date = new Date(tide.date);
+    const day = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][date.getDay()];
+    chartData.labels.push(day + ' ' + date.toLocaleDateString('en-US', {month: 'short', day: 'numeric'}));
+    chartData.datasets[0].data.push(tide.height);
+  });
+
+  const tideChart = new Chart(document.getElementById('tideChart').getContext('2d'), {
+    type: 'line',
+    data: chartData,
+    options: {
+      scales: {
+        x: {
+          display: true,
+          title: {
+            display: true,
+            text: 'Day of Week'
+          }
+        },
+        y: {
+          display: true,
+          title: {
+            display: true,
+            text: 'Tide Height (ft)'
+          },
+          beginAtZero: true
+        }
+      },
+      plugins: {
+        afterDraw: (chart) => {
+          // Add vertical line at "now"
+          if (chart.data.datasets[0].data[nowIndex] !== undefined) {
+            const context = chart.ctx;
+            const yAxis = chart.scales['y'];
+            const xPos = chart.scales['x'].getPixelForTick(nowIndex);
+            const yPos = yAxis.getPixelForValue(chart.data.datasets[0].data[nowIndex]);
+            context.save();
+            context.beginPath();
+            context.moveTo(xPos, yAxis.top);
+            context.lineTo(xPos, yAxis.bottom);
+            context.lineWidth = 2;
+            context.strokeStyle = '#FF0000';
+            context.stroke();
+            context.restore();
+          }
+        },
+      }
+    }
+  });
+};
+
+export { createTideChart };
+

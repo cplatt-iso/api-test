@@ -7,13 +7,17 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <h1>Tide Information</h1>
-  <div id="tideData">
-    Loading tide data...
+  <div class="container">
+    <h1>Tide Information</h1>
+    <div id="tideData">
+      Loading tide data...
+    </div>
+    <canvas id="tideChart"></canvas>
   </div>
-  <canvas id="tideChart"></canvas>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="script.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.8.0/chart.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/suncalc/1.8.0/suncalc.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/1.4.0/chartjs-plugin-annotation.min.js"></script>
+  <script type="module" src="script.js"></script>
 </body>
 </html>
 
