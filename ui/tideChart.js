@@ -1,4 +1,4 @@
-import { calculateSunEvents, formatDate } from './utils.js';
+import { formatDate } from './utils.js';
 
 const createTideChart = (data) => {
   const chartData = {
@@ -7,13 +7,13 @@ const createTideChart = (data) => {
       {
         label: 'Tide Height',
         data: [],
-        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+        backgroundColor: 'rgba(54, 162, 235, 0.5)',
         borderColor: 'rgba(54, 162, 235, 1)',
         borderWidth: 1,
-        tension: 0.4, // set tension to 0.4 for a more smooth line
+        tension: 0.4,
         fill: true,
-      }
-    ]
+      },
+    ],
   };
 
   const now = new Date();
@@ -26,24 +26,35 @@ const createTideChart = (data) => {
     chartData.datasets[0].data.push(tide.height);
   });
 
-  const sunEvents = calculateSunEvents(data);
+  const verticalLinePlugin = {
+    id: 'verticalLinePlugin',
+    afterDraw: (chart) => {
+      const { ctx, scales, config } = chart;
+      const nowIndex = config.options.plugins.verticalLinePlugin.nowIndex;
 
-  const annotations = sunEvents.flatMap((event, index) => {
-    const sunriseIndex = chartData.labels.findIndex(label => label === formatDate(event.sunrise));
-    const sunsetIndex = chartData.labels.findIndex(label => label === formatDate(event.sunset));
+      if (nowIndex !== undefined) {
+        const yAxis = scales.y;
+        const xScale = scales.x;
+        const xPos1 = xScale.getPixelForValue(chartData.labels[nowIndex], nowIndex);
+        const xPos2 = xScale.getPixelForValue(chartData.labels[nowIndex + 1], nowIndex + 1);
+        const prevTide = new Date(data.tides[nowIndex].date);
+        const nextTide = new Date(data.tides[nowIndex + 1].date);
+        const now = new Date();
 
-    return [
-      {
-        type: 'box',
-        xMin: sunriseIndex,
-        xMax: sunsetIndex,
-        yMin: 0,
-        yMax: 10, // Set this to an appropriate maximum tide height value
-        backgroundColor: 'rgba(200, 200, 255, 0.2)',
-        borderColor: 'rgba(0, 0, 0, 0)',
-      },
-    ];
-  });
+        const ratio = (now - prevTide) / (nextTide - prevTide);
+        const xPos = xPos1 + (xPos2 - xPos1) * ratio;
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(xPos, yAxis.top);
+        ctx.lineTo(xPos, yAxis.bottom);
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#FF0000';
+        ctx.stroke();
+        ctx.restore();
+      }
+    },
+  };
 
   new Chart(document.getElementById('tideChart').getContext('2d'), {
     type: 'line',
@@ -66,14 +77,12 @@ const createTideChart = (data) => {
         },
       },
       plugins: {
-        annotation: {
-          annotations: annotations,
-        },
-        verticalLine: {
-          nowIndex,
+        verticalLinePlugin: {
+          nowIndex: nowIndex,
         },
       },
     },
+    plugins: [verticalLinePlugin],
   });
 };
 

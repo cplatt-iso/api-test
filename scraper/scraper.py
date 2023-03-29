@@ -11,8 +11,9 @@ LONGITUDE = os.environ["LONGITUDE"]
 
 r = redis.Redis(host=REDIS_HOST, port=6379, db=0)
 
+
 def fetch_tide_data():
-    url = f"https://www.worldtides.info/api/v3?datum=LAT&extremes&key={API_KEY}&lat={LATITUDE}&lon={LONGITUDE}"
+    url = f"https://www.worldtides.info/api/v3?datum=CD&extremes&key={API_KEY}&lat={LATITUDE}&lon={LONGITUDE}"
     response = requests.get(url)
     print("Response content:", response.text)
     data = response.json()
